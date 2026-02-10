@@ -34,7 +34,43 @@
     .status{font-size:13px;margin-top:8px}
     .status.ok{color:#76ffb1}
     .status.err{color:#ff9aa4}
-  </style>
+  
+    /* --- Background image (replace URL with your own) --- */
+    body{
+      position: relative;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(7,16,34,.80), rgba(11,18,32,.88)),
+        url("assets/order-bg.jpg") center/cover no-repeat;
+      filter:saturate(1.05);
+      z-index:-1;
+    }
+
+    /* --- Order details alignment --- */
+    .grid-2{
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      align-items: start;
+    }
+    .span-2{ grid-column: 1 / -1; }
+
+    input, textarea, select{
+      height: 44px;
+    }
+    textarea{ height:auto; min-height:90px; }
+
+    /* --- Medicine table alignment --- */
+    table{ table-layout: fixed; }
+    th:nth-child(2), td:nth-child(2){ width: 160px; }
+    th:nth-child(3), td:nth-child(3){ width: 170px; }
+    .qty{ width: 100%; max-width: 140px !important; }
+    .uom{ width: 100%; max-width: 160px !important; }
+
+</style>
 
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -274,22 +310,24 @@
     const referredFlag = document.getElementById("referredFlag");
     const ref1 = document.getElementById("referrerFields");
     const ref2 = document.getElementById("referrerFields2");
+    const ref3 = document.getElementById("referrerFields3");
 
-    if (referredFlag) {
-      referredFlag.addEventListener("change", () => {
-        if (referredFlag.value === "Yes") {
-          ref1.style.display = "block";
-          ref2.style.display = "block";
-          document.getElementById("referrerFields3").style ("display","block");
-        } else {
-          ref1.style.display = "none";
-          ref2.style.display = "none";
-          document.getElementById("referrerFields3").style ("display","none");
-        }
-      });
+    function setRefVisibility(isYes){
+      const d = isYes ? "block" : "none";
+      if (ref1) ref1.style.display = d;
+      if (ref2) ref2.style.display = d;
+      if (ref3) ref3.style.display = d;
     }
 
-    $("custEmail").addEventListener("focus", () => {
+    if (referredFlag) {
+      // set initial state
+      setRefVisibility(referredFlag.value === "Yes");
+
+      referredFlag.addEventListener("change", () => {
+        setRefVisibility(referredFlag.value === "Yes");
+      });
+    }
+$("custEmail").addEventListener("focus", () => {
       // auto-fill customer email from logged-in user (optional)
       const user = auth.currentUser;
       if (user && !$("custEmail").value) $("custEmail").value = user.email || "";
@@ -344,6 +382,7 @@
           <input id="custName" type="text" placeholder="Full Name" />
         </div>
         <div>
+          <div class="span-2">
           <label>Contact No</label>
           <input id="custPhone" type="tel" placeholder="+91 XXXXX XXXXX" />
         </div>
@@ -380,6 +419,7 @@
         </div>
 
         <div>
+          <div class="span-2">
           <label>Address</label>
           <input id="custAddress" type="text" placeholder="Full delivery address" />
         </div>
