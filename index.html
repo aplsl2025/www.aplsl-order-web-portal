@@ -82,6 +82,23 @@
       #orderCard .grid.grid-2{ grid-template-columns: 1fr; }
     }
 
+
+/* --- Compact Order Details inputs (NO other sections affected) --- */
+#orderCard input,
+#orderCard select{
+  padding:6px 10px;
+  box-sizing:border-box;
+}
+
+
+/* --- Logo sizing (responsive & premium) --- */
+.logo-img{
+  max-height:130px;
+  max-width:400px;
+  width:auto;
+  object-fit:contain;
+}
+
 </style>
 
   <!-- EmailJS -->
@@ -367,9 +384,9 @@
 
     <!-- Ahanitya Logo Display Card -->
     <div class="card" style="margin-bottom:14px;text-align:center">
-      <img src="images/Ahanitya pharma life science llp (3).png"
+      <img src="assets/ahanitya-logo.png"
            alt="Ahanitya Pharma Life Science LLP"
-           style="max-height:80px;max-width:260px;object-fit:contain;">
+           class="logo-img">
     </div>
 
     <div class="card" style="margin-bottom:14px">
@@ -483,7 +500,7 @@
       </div>
 
       <div class="row" style="margin-top:14px">
-        <button class="btn btn-primary" id="btnSubmit">Submit Order (Email + WhatsApp)</button> 
+        <button class="btn btn-primary" id="btnSubmit">Submit Order (Email + WhatsApp)</button>
         <button class="btn btn-danger" onclick="location.reload()">Reset</button>
       </div>
 
