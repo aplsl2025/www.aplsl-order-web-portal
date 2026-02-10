@@ -46,9 +46,11 @@
     table{
       table-layout: fixed;
     }
-    th:nth-child(1), td:nth-child(1){ width: auto; }
-    th:nth-child(2), td:nth-child(2){ width: 140px; }
-    th:nth-child(3), td:nth-child(3){ width: 160px; }
+    th:nth-child(1), td:nth-child(1){ width: 70px; }
+    th:nth-child(2), td:nth-child(2){ width: 160px; }
+    th:nth-child(3), td:nth-child(3){ width: auto; }
+    th:nth-child(4), td:nth-child(4){ width: 140px; }
+    th:nth-child(5), td:nth-child(5){ width: 160px; }
 
     .qty{ width:100%; }
     .uom{ width:100%; }
@@ -120,28 +122,35 @@
 
     // ---------- Medicines (Edit your list) ----------
     const MEDICINES = [
-      "Pantoprazole + Domperidone (Capsule)",
-      "Levocetirizine (Tablet)",
-      "Montelukast + Levocetirizine (Tablet)",
-      "Azithromycin (Tablet)",
-      "Cefixime (Tablet)",
-      "Paracetamol (Tablet)",
-      "Vitamin D3 (Softgel)",
-      "Multivitamin (Capsule)"
+      { brand: "AZIN-500", strength: "Azithromycin Tablets I.P 500 mg" },
+      { brand: "ASP", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" },
+      { brand: "A-SUNAC", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" },
+      { brand: "APLSL-DiaMet", strength: "Glimepiride 2 mg + Metformin HCl (ER)" },
+      { brand: "APLSL-Lulizid", strength: "Luliconazole 1%" },
+      { brand: "Ahanitya-Ketozin", strength: "Ketoconazole 2%" },
+      { brand: "APLSL-Cutiderm", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05%" },
+      { brand: "Ahanitya-AmbroLev", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg" },
+      { brand: "PANTO-DSR", strength: "Pantoprazole 40 mg + Domperidone 30 mg" },
+      { brand: "LE-MONT", strength: "Montelukast 10 mg + Levocetirizine 5 mg" }
     ];
 
     function renderMedicineRows() {
       const tbody = $("medBody");
       tbody.innerHTML = "";
-      MEDICINES.forEach((name, idx) => {
+      MEDICINES.forEach((item, idx) => {
+        const keyRaw = `${item.brand} (${item.strength})`;
+        const key = escapeHtml(keyRaw);
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${name}</td>
+          <td>${idx + 1}</td>
+          <td>${escapeHtml(item.brand)}</td>
+          <td>${escapeHtml(item.strength)}</td>
           <td class="right">
-            <input type="number" min="0" step="1" value="0" data-med="${escapeHtml(name)}" class="qty" style="max-width:110px">
+            <input type="number" min="0" step="1" value="0" data-med="${key}" class="qty" style="max-width:110px">
           </td>
           <td class="right">
-            <select class="uom" data-uom-med="${escapeHtml(name)}" style="max-width:140px">
+            <select class="uom" data-uom-med="${key}" style="max-width:140px">
               <option value="Box">Box</option>
               <option value="Strip">Strip</option>
               <option value="Each">Each</option>
@@ -459,7 +468,9 @@
         <table>
           <thead>
             <tr>
-              <th>Medicine</th>
+              <th>Sr No</th>
+              <th>Brand Name</th>
+              <th>Strength</th>
               <th class="right">Quantity</th>
               <th class="right">Measurement</th>
             </tr>
@@ -485,4 +496,3 @@
   </div>
 </body>
 </html>
-
