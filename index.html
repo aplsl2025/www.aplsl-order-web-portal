@@ -205,6 +205,10 @@
       // 1) Send Email via EmailJS
       try {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          // IMPORTANT: Your EmailJS template "To Email" should be set to {{to_email}} OR fixed to the receiver.
+          // We pass to_email here to avoid "recipient address is empty".
+          to_email: RECEIVER_EMAIL,
+
           // These keys MUST match your EmailJS template variables like:
           // {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{customer_address}}, {{order_details}}
           customer_name: payload.customer_name,
