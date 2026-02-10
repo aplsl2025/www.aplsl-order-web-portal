@@ -94,6 +94,13 @@
           <td class="right">
             <input type="number" min="0" step="1" value="0" data-med="${escapeHtml(name)}" class="qty" style="max-width:110px">
           </td>
+          <td class="right">
+            <select class="uom" data-uom-med="${escapeHtml(name)}" style="max-width:140px">
+              <option value="Box">Box</option>
+              <option value="Strip">Strip</option>
+              <option value="Each">Each</option>
+            </select>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -135,6 +142,14 @@
       lines.push(`📧 Email: ${payload.customer_email}`);
       lines.push(`📞 Contact: ${payload.customer_phone}`);
       lines.push(`🏢 Business Type: ${payload.business_type || ""}`);
+      lines.push(`👥 Referred By: ${payload.referred_by}`);
+      if (payload.referred_by === "Yes") {
+        lines.push(`🙍 Referrer Name: ${payload.referrer_name}`);
+        lines.push(`🎓 Referrer Designation: ${payload.referrer_designation}`);
+        if (payload.referrer_email) {
+          lines.push(`📧 Referrer Email: ${payload.referrer_email}`);
+        }
+      }
       lines.push("");
       lines.push("💊 *Medicines Ordered:*");
       payload.items.forEach((it, i) => lines.push(`${i+1}. ${it.med} — Qty: ${it.qty} ${it.uom}`));
@@ -208,6 +223,10 @@
         receiver_email: RECEIVER_EMAIL,
         items,
         business_type: $("custBusiness") ? $("custBusiness").value.trim() : "",
+        referred_by: $("referredFlag") ? $("referredFlag").value : "No",
+        referrer_name: $("referrerName") ? $("referrerName").value.trim() : "",
+        referrer_designation: $("referrerDesignation") ? $("referrerDesignation").value.trim() : "",
+        referrer_email: $("referrerEmail") ? $("referrerEmail").value.trim() : "",
       };
 
       if (!payload.customer_name || !payload.customer_address || !payload.customer_email || !payload.customer_phone || !payload.business_type) {
@@ -251,6 +270,25 @@
 
     // Init page
     renderMedicineRows();
+
+    const referredFlag = document.getElementById("referredFlag");
+    const ref1 = document.getElementById("referrerFields");
+    const ref2 = document.getElementById("referrerFields2");
+
+    if (referredFlag) {
+      referredFlag.addEventListener("change", () => {
+        if (referredFlag.value === "Yes") {
+          ref1.style.display = "block";
+          ref2.style.display = "block";
+          document.getElementById("referrerFields3").style ("display","block");
+        } else {
+          ref1.style.display = "none";
+          ref2.style.display = "none";
+          document.getElementById("referrerFields3").style ("display","none");
+        }
+      });
+    }
+
     $("custEmail").addEventListener("focus", () => {
       // auto-fill customer email from logged-in user (optional)
       const user = auth.currentUser;
@@ -325,6 +363,22 @@
             <option>W/R</option>
           </select>
         </div>
+        <div>
+          <label>Referred By</label>
+          <select id="referredFlag">
+            <option value="No" selected>No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </div>
+        <div id="referrerFields" style="display:none;">
+          <label>Referrer Name</label>
+          <input id="referrerName" type="text" placeholder="Referrer full name" />
+        </div>
+        <div id="referrerFields2" style="display:none;">
+          <label>Referrer Designation</label>
+          <input id="referrerDesignation" type="text" placeholder="Doctor / MR / Distributor etc." />
+        </div>
+
         <div>
           <label>Address</label>
           <input id="custAddress" type="text" placeholder="Full delivery address" />
