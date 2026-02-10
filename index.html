@@ -6,10 +6,27 @@
   <title>Ahanitya Order Portal</title>
 
   <style>
-    :root { --brand:#1b8ea6; --bg:#060b14; --card:#0f1a2b; --text:#f1f5ff; --muted:#9fb2cc; --danger:#ff6b6b; }
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071022,#0b1220);color:var(--text)}
+    :root { 
+  --brand:#1b8ea6;
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#475569;
+  --danger:#dc2626;
+
+  /* Doctor-friendly sizing */
+  --base-font: 16px;
+  --label-font: 13px;
+  --input-font: 15px;
+  --table-font: 14px;
+
+  /* Accents */
+  --accent-soft: rgba(27,142,166,.22);
+  --accent-strong: rgba(27,142,166,.55);
+}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#f7fbff,#eef5ff);color:var(--text)}
     .wrap{max-width:980px;margin:0 auto;padding:24px}
-    .card{background:rgba(17,27,46,.85);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+    .card{position:relative;background:linear-gradient(180deg,#ffffff,#fbfdff);border:1px solid #e5e7eb;border-radius:16px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.08);overflow:hidden}
     h1{margin:0 0 10px;font-size:22px}
     h2{margin:0 0 12px;font-size:18px;color:#dfe8ff}
     .grid{display:grid;gap:14px}
@@ -121,6 +138,134 @@
   padding:16px;
   border-radius:14px;
   border:1px solid rgba(255,255,255,.08);
+}
+
+
+/* --- Light theme input & dropdown styling --- */
+input, textarea{
+  background:#ffffff;
+  color:#111827;
+}
+
+select{
+  background:#ffffff;
+  color:#000000 !important;
+  font-weight:700;
+}
+
+select option{
+  color:#000000;
+  font-weight:700;
+}
+
+
+/* --- Brand accent line on cards --- */
+.card::before{
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0;
+  height:6px;
+  background:linear-gradient(90deg,var(--accent-strong),var(--accent-soft));
+}
+
+/* --- Doctor-friendly typography --- */
+body{font-size:var(--base-font)}
+label{font-size:var(--label-font)}
+input,textarea,select{font-size:var(--input-font)}
+th,td{font-size:var(--table-font)}
+h1{font-size:24px}
+h2{font-size:19px}
+
+/* Make form elements more readable on light theme */
+input, textarea{
+  background:#ffffff;
+  color:#111827;
+}
+select{
+  background:#ffffff;
+  color:#000000 !important;
+  font-weight:700;
+}
+select option{
+  color:#000000;
+  font-weight:700;
+}
+
+/* --- Theme toggle button --- */
+.btn-toggle{
+  background:transparent;
+  border:1px solid rgba(15,23,42,.18);
+  color:#0f172a;
+}
+.btn-toggle:hover{border-color:rgba(27,142,166,.55)}
+
+/* --- Dark theme (toggle) --- */
+body[data-theme="dark"]{
+  --bg:#060b14;
+  --card:#0f1a2b;
+  --text:#f1f5ff;
+  --muted:#9fb2cc;
+  background:linear-gradient(180deg,#071022,#0b1220);
+}
+body[data-theme="dark"] .card{
+  background:rgba(15,26,43,.90);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+body[data-theme="dark"] .btn-toggle{
+  border-color:rgba(255,255,255,.18);
+  color:#f1f5ff;
+}
+body[data-theme="dark"] input,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] select{
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="dark"] select,
+body[data-theme="dark"] select option{
+  color:var(--text) !important;
+  font-weight:700;
+}
+body[data-theme="dark"] th{background:rgba(255,255,255,.04); color:#cfe6ff}
+
+
+/* --- Light mode visibility fixes (Status pill + Table + Section overlays) --- */
+
+/* Status pill readable in light mode */
+body:not([data-theme="dark"]) .pill{
+  background:#e6f6fa;
+  border:1px solid #1b8ea6;
+  color:#0f172a;
+  font-weight:600;
+}
+
+/* Light mode: use LIGHT overlays on section background images */
+body:not([data-theme="dark"]) #orderCard{
+  background:
+    linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
+    url("assets/order-bg.jpg");
+}
+
+body:not([data-theme="dark"]) #medSection{
+  background:
+    linear-gradient(rgba(255,255,255,0.90), rgba(255,255,255,0.90)),
+    url("images/product portfolio (1).png");
+  border:1px solid #e5e7eb;
+}
+
+/* Light mode: table text/borders readable */
+body:not([data-theme="dark"]) th{
+  color:#0f172a;
+  background:#f1f5f9;
+}
+body:not([data-theme="dark"]) td{
+  color:#0f172a;
+}
+body:not([data-theme="dark"]) th, 
+body:not([data-theme="dark"]) td{
+  border-bottom:1px solid #e5e7eb;
 }
 
 </style>
@@ -419,6 +564,7 @@
         <div class="muted">
           Status: <span class="pill" id="who">Not logged in</span>
         </div>
+        <button class="btn btn-ghost btn-toggle" id="btnTheme" type="button">Dark Mode</button>
         <button class="btn btn-ghost" id="btnLogout">Logout</button>
       </div>
     </div>
@@ -535,5 +681,31 @@
       </div>
     </div>
   </div>
+
+<script>
+(function(){
+  const KEY = "ahanitya_theme";
+  const apply = (t) => {
+    document.body.setAttribute("data-theme", t);
+    const btn = document.getElementById("btnTheme");
+    if (btn) btn.textContent = (t === "dark") ? "Light Mode" : "Dark Mode";
+  };
+
+  // init
+  const saved = localStorage.getItem(KEY);
+  apply(saved === "dark" ? "dark" : "light");
+
+  // bind (button exists even when logged out)
+  document.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "btnTheme") {
+      const cur = document.body.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      const next = cur === "dark" ? "light" : "dark";
+      localStorage.setItem(KEY, next);
+      apply(next);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
