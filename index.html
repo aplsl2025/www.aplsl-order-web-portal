@@ -105,8 +105,22 @@
 
     function getOrderItems() {
       const qtyInputs = Array.from(document.querySelectorAll(".qty"));
+      const uomInputs = Array.from(document.querySelectorAll(".uom"));
+
+      // Build a map: medicine -> unit
+      const uomMap = new Map(
+        uomInputs.map(sel => [sel.getAttribute("data-uom-med"), sel.value])
+      );
+
       const items = qtyInputs
-        .map(inp => ({ med: inp.getAttribute("data-med"), qty: Number(inp.value || 0) }))
+        .map(inp => {
+          const med = inp.getAttribute("data-med");
+          return {
+            med,
+            qty: Number(inp.value || 0),
+            uom: uomMap.get(med) || "Box"
+          };
+        })
         .filter(x => x.qty > 0);
 
       return items;
@@ -120,9 +134,10 @@
       lines.push(`📍 Address: ${payload.customer_address}`);
       lines.push(`📧 Email: ${payload.customer_email}`);
       lines.push(`📞 Contact: ${payload.customer_phone}`);
+      lines.push(`🏢 Business Type: ${payload.business_type || ""}`);
       lines.push("");
       lines.push("💊 *Medicines Ordered:*");
-      payload.items.forEach((it, i) => lines.push(`${i+1}. ${it.med} — Qty: ${it.qty}`));
+      payload.items.forEach((it, i) => lines.push(`${i+1}. ${it.med} — Qty: ${it.qty} ${it.uom}`));
       lines.push("");
       lines.push(`🗓 Date/Time: ${new Date().toLocaleString()}`);
       return lines.join("\n");
@@ -192,10 +207,11 @@
         customer_phone: $("custPhone").value.trim(),
         receiver_email: RECEIVER_EMAIL,
         items,
+        business_type: $("custBusiness") ? $("custBusiness").value.trim() : "",
       };
 
-      if (!payload.customer_name || !payload.customer_address || !payload.customer_email || !payload.customer_phone) {
-        $("orderStatus").textContent = "Please fill Name, Address, Email and Contact No.";
+      if (!payload.customer_name || !payload.customer_address || !payload.customer_email || !payload.customer_phone || !payload.business_type) {
+        $("orderStatus").textContent = "Please fill Name, Address, Email, Contact No and Business Type.";
         $("orderStatus").className = "status err";
         return;
       }
@@ -215,7 +231,8 @@
           customer_email: payload.customer_email,
           customer_phone: payload.customer_phone,
           customer_address: payload.customer_address,
-          order_details: orderText
+          order_details: orderText,
+          business_type: payload.business_type
         });
 
         // 2) Open WhatsApp with prefilled message
@@ -297,6 +314,18 @@
           <input id="custEmail" type="email" placeholder="Customer email" />
         </div>
         <div>
+          <label>Business Type</label>
+          <select id="custBusiness">
+            <option value="" selected disabled>Select business type</option>
+            <option>Doctor</option>
+            <option>Wholeseller</option>
+            <option>Distributor</option>
+            <option>Stockist</option>
+            <option>Retailer</option>
+            <option>W/R</option>
+          </select>
+        </div>
+        <div>
           <label>Address</label>
           <input id="custAddress" type="text" placeholder="Full delivery address" />
         </div>
@@ -309,6 +338,7 @@
             <tr>
               <th>Medicine</th>
               <th class="right">Quantity</th>
+              <th class="right">Measurement</th>
             </tr>
           </thead>
           <tbody id="medBody"></tbody>
