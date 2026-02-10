@@ -35,40 +35,13 @@
     .status.ok{color:#76ffb1}
     .status.err{color:#ff9aa4}
   
-    /* --- Background image (replace URL with your own) --- */
-    body{
-      position: relative;
-      overflow-x:hidden;
+    /* --- Fix: Order Details grid overlap --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    .grid-2 { align-items: start; }
+    .grid-2 > div { min-width: 0; }
+    @media (min-width:860px){
+      .grid-2{ grid-template-columns: repeat(2, minmax(260px, 1fr)); }
     }
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(7,16,34,.80), rgba(11,18,32,.88)),
-        url("assets/order-bg.jpg") center/cover no-repeat;
-      filter:saturate(1.05);
-      z-index:-1;
-    }
-
-    /* --- Order details alignment --- */
-    .grid-2{
-      grid-template-columns: repeat(2, minmax(260px, 1fr));
-      align-items: start;
-    }
-    .span-2{ grid-column: 1 / -1; }
-
-    input, textarea, select{
-      height: 44px;
-    }
-    textarea{ height:auto; min-height:90px; }
-
-    /* --- Medicine table alignment --- */
-    table{ table-layout: fixed; }
-    th:nth-child(2), td:nth-child(2){ width: 160px; }
-    th:nth-child(3), td:nth-child(3){ width: 170px; }
-    .qty{ width: 100%; max-width: 140px !important; }
-    .uom{ width: 100%; max-width: 160px !important; }
 
 </style>
 
@@ -307,27 +280,72 @@
     // Init page
     renderMedicineRows();
 
+
+    // ---------- Logo Upload (preview + remember locally) ----------
+    const logoUpload = $("logoUpload");
+    const logoPreview = $("logoPreview");
+    const logoClear = $("logoClear");
+
+    function setLogo(dataUrl){
+      if (!logoPreview) return;
+      if (dataUrl){
+        logoPreview.src = dataUrl;
+        logoPreview.style.display = "block";
+        if (logoClear) logoClear.style.display = "inline-block";
+      } else {
+        logoPreview.removeAttribute("src");
+        logoPreview.style.display = "none";
+        if (logoClear) logoClear.style.display = "none";
+      }
+    }
+
+    try {
+      const savedLogo = localStorage.getItem("ahanitya_logo");
+      if (savedLogo) setLogo(savedLogo);
+    } catch (_) {}
+
+    if (logoUpload) {
+      logoUpload.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = String(reader.result || "");
+          setLogo(dataUrl);
+          try { localStorage.setItem("ahanitya_logo", dataUrl); } catch (_) {}
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (logoClear) {
+      logoClear.addEventListener("click", () => {
+        if (logoUpload) logoUpload.value = "";
+        setLogo("");
+        try { localStorage.removeItem("ahanitya_logo"); } catch (_) {}
+      });
+    }
+
+
     const referredFlag = document.getElementById("referredFlag");
     const ref1 = document.getElementById("referrerFields");
     const ref2 = document.getElementById("referrerFields2");
-    const ref3 = document.getElementById("referrerFields3");
-
-    function setRefVisibility(isYes){
-      const d = isYes ? "block" : "none";
-      if (ref1) ref1.style.display = d;
-      if (ref2) ref2.style.display = d;
-      if (ref3) ref3.style.display = d;
-    }
 
     if (referredFlag) {
-      // set initial state
-      setRefVisibility(referredFlag.value === "Yes");
-
       referredFlag.addEventListener("change", () => {
-        setRefVisibility(referredFlag.value === "Yes");
+        if (referredFlag.value === "Yes") {
+          ref1.style.display = "block";
+          ref2.style.display = "block";
+          document.getElementById("referrerFields3").style ("display","block");
+        } else {
+          ref1.style.display = "none";
+          ref2.style.display = "none";
+          document.getElementById("referrerFields3").style ("display","none");
+        }
       });
     }
-$("custEmail").addEventListener("focus", () => {
+
+    $("custEmail").addEventListener("focus", () => {
       // auto-fill customer email from logged-in user (optional)
       const user = auth.currentUser;
       if (user && !$("custEmail").value) $("custEmail").value = user.email || "";
@@ -338,6 +356,22 @@ $("custEmail").addEventListener("focus", () => {
 
 <body>
   <div class="wrap">
+
+    <div class="card" style="margin-bottom:14px">
+      <h2 style="margin-bottom:10px">Upload Ahanitya Logo</h2>
+      <div class="grid grid-2" style="align-items:center">
+        <div>
+          <label>Select Logo (PNG/JPG)</label>
+          <input id="logoUpload" type="file" accept="image/*" />
+          <div class="muted" style="margin-top:6px">Tip: Use transparent PNG for best look.</div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px">
+          <img id="logoPreview" alt="Logo preview" style="max-height:60px;max-width:220px;object-fit:contain;display:none" />
+          <button class="btn btn-ghost" id="logoClear" type="button" style="max-width:160px;display:none">Remove Logo</button>
+        </div>
+      </div>
+    </div>
+
     <div class="card" style="margin-bottom:14px">
       <h1>Ahanitya Pharma Order Portal</h1>
       <div class="row" style="justify-content:space-between;align-items:center">
@@ -382,7 +416,6 @@ $("custEmail").addEventListener("focus", () => {
           <input id="custName" type="text" placeholder="Full Name" />
         </div>
         <div>
-          <div class="span-2">
           <label>Contact No</label>
           <input id="custPhone" type="tel" placeholder="+91 XXXXX XXXXX" />
         </div>
@@ -419,7 +452,6 @@ $("custEmail").addEventListener("focus", () => {
         </div>
 
         <div>
-          <div class="span-2">
           <label>Address</label>
           <input id="custAddress" type="text" placeholder="Full delivery address" />
         </div>
