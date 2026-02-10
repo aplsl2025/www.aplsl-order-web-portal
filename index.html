@@ -205,9 +205,13 @@
       // 1) Send Email via EmailJS
       try {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          to_email: RECEIVER_EMAIL,
-          subject: `New Order - ${payload.customer_name} (${payload.customer_phone})`,
-          message: orderText
+          // These keys MUST match your EmailJS template variables like:
+          // {{customer_name}}, {{customer_email}}, {{customer_phone}}, {{customer_address}}, {{order_details}}
+          customer_name: payload.customer_name,
+          customer_email: payload.customer_email,
+          customer_phone: payload.customer_phone,
+          customer_address: payload.customer_address,
+          order_details: orderText
         });
 
         // 2) Open WhatsApp with prefilled message
@@ -218,7 +222,7 @@
         $("orderStatus").className = "status ok";
 
       } catch (e) {
-        $("orderStatus").textContent = "Email sending failed. Please check EmailJS keys/template.";
+        $("orderStatus").textContent = "Email sending failed: " + (e?.text || e?.message || "Unknown error") + " (check EmailJS service/template & Gmail permission).";
         $("orderStatus").className = "status err";
         console.error(e);
       }
