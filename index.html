@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-  
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -52,6 +51,7 @@
     .status{font-size:13px;margin-top:8px}
     .status.ok{color:#76ffb1}
     .status.err{color:#ff9aa4}
+    .na-text{display:inline-block;color:var(--danger);font-weight:800;font-size:12px}
   
     /* --- Alignment fix: Order Details & Medicines table ONLY --- */
     .grid.grid-2{
@@ -131,7 +131,7 @@
 /* Select Medicines & Quantity background (scoped) */
 #medSection{
   background:
-    linear-gradient(rgba(10,18,35,0.30), rgba(10,18,35,0.60)),
+    linear-gradient(rgba(10,18,35,0.90), rgba(10,18,35,0.90)),
     url("images/product portfolio (1).png");
   background-size: cover;
   background-position: center;
@@ -245,7 +245,7 @@ body:not([data-theme="dark"]) .pill{
 /* Light mode: use LIGHT overlays on section background images */
 body:not([data-theme="dark"]) #orderCard{
   background:
-    linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0.45)),
+    linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
     url("assets/order-bg.jpg");
 }
 
@@ -309,16 +309,16 @@ body:not([data-theme="dark"]) td{
 
     // ---------- Medicines (Edit your list) ----------
     const MEDICINES = [
-      { brand: "AZIN-500", strength: "Azithromycin Tablets I.P 500 mg" },
-      { brand: "ASP", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" },
-      { brand: "A-SUNAC", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" },
-      { brand: "APLSL-DiaMet", strength: "Glimepiride 2 mg + Metformin HCl (ER),available:False" },
-      { brand: "APLSL-Lulizid", strength: "Luliconazole 1%,available:False" },
-      { brand: "Ahanitya-Ketozin", strength: "Ketoconazole 2%" },
-      { brand: "APLSL-Cutiderm", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05% ,available:False" },
-      { brand: "Ahanitya-AmbroLev", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg ,available:False" },
-      { brand: "PANTO-DSR", strength: "Pantoprazole 40 mg + Domperidone 30 mg" },
-      { brand: "LE-MONT", strength: "Montelukast 10 mg + Levocetirizine 5 mg" }
+      { brand: "AZIN-500", strength: "Azithromycin Tablets I.P 500 mg" , available: true },
+      { brand: "ASP", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" , available: true },
+      { brand: "A-SUNAC", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" , available: true },
+      { brand: "APLSL-DiaMet", strength: "Glimepiride 2 mg + Metformin HCl (ER)" , available: true },
+      { brand: "APLSL-Lulizid", strength: "Luliconazole 1%" , available: true },
+      { brand: "Ahanitya-Ketozin", strength: "Ketoconazole 2%" , available: true },
+      { brand: "APLSL-Cutiderm", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05%" , available: true },
+      { brand: "Ahanitya-AmbroLev", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg" , available: true },
+      { brand: "PANTO-DSR", strength: "Pantoprazole 40 mg + Domperidone 30 mg" , available: true },
+      { brand: "LE-MONT", strength: "Montelukast 10 mg + Levocetirizine 5 mg" , available: true }
     ];
 
     function renderMedicineRows() {
@@ -328,22 +328,27 @@ body:not([data-theme="dark"]) td{
         const keyRaw = `${item.brand} (${item.strength})`;
         const key = escapeHtml(keyRaw);
 
+        // Availability (set available:false in MEDICINES to show Not Available)
+        const isNA = (item.available === false);
+        const qtyHtml = isNA
+          ? `<span class="na-text">Not Available</span>`
+          : `<input type="number" min="0" step="1" value="0" data-med="${key}" class="qty" style="max-width:110px">`;
+        const uomHtml = isNA
+          ? `<span class="na-text">—</span>`
+          : `<select class="uom" data-uom-med="${key}" style="max-width:140px">
+               <option value="Box">Box</option>
+               <option value="Strip">Strip</option>
+               <option value="Each">Each</option>
+             </select>`;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${idx + 1}</td>
           <td>${escapeHtml(item.brand)}</td>
           <td>${escapeHtml(item.strength)}</td>
-          <td class="right">
-            <input type="number" min="0" step="1" value="0" data-med="${key}" class="qty" style="max-width:110px">
-          </td>
-          <td class="right">
-            <select class="uom" data-uom-med="${key}" style="max-width:140px">
-              <option value="Box">Box</option>
-              <option value="Strip">Strip</option>
-              <option value="Each">Each</option>
-            </select>
-          </td>
-        `;
+          <td class="right">${qtyHtml}</td>
+          <td class="right">${uomHtml}</td>
+`;
         tbody.appendChild(tr);
       });
     }
