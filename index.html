@@ -269,6 +269,36 @@ body:not([data-theme="dark"]) td{
   border-bottom:1px solid #e5e7eb;
 }
 
+
+/* --- Fixed size + 2D scroll for Select Medicines & Quantity --- */
+#medSection{
+  /* Fixed box size (adjust if needed) */
+  height: 520px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* keep scroll only inside table area */
+}
+
+/* The scrollable area inside the section (both vertical + horizontal) */
+#medSection .medScroll{
+  height: calc(520px - 130px); /* leaves room for title + buttons + small notes */
+  overflow: auto;             /* enables top-bottom + left-right scroll */
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+/* Ensure horizontal scroll appears when needed */
+#medSection table{
+  min-width: 760px; /* forces horizontal scroll on small screens */
+}
+
+@media (max-width: 480px){
+  #medSection{ height: 480px; }
+  #medSection .medScroll{ height: calc(480px - 140px); }
+  #medSection table{ min-width: 720px; }
+}
+
+
 </style>
 
   <!-- EmailJS -->
@@ -658,7 +688,8 @@ body:not([data-theme="dark"]) td{
         <button class="btn btn-danger" onclick="location.reload()">Reset</button>
       </div>
 
-        <table>
+        <div class="medScroll">
+<table>
           <thead>
             <tr>
               <th>Sr No</th>
@@ -671,6 +702,7 @@ body:not([data-theme="dark"]) td{
           <tbody id="medBody"></tbody>
         </table>
         <div class="muted" style="margin-top:8px">Set quantity 0 for items not required.</div>
+</div>
 
       
       </div>
