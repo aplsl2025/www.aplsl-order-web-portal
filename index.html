@@ -319,7 +319,25 @@ body:not([data-theme="dark"]) td{
 #medSection .medScroll tr{
   white-space: normal;
 }
+/* Login / Create Account: prevent overlap */
+.login-row{
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;          /* stacks on small screens */
+}
 
+.login-row .field{
+  flex: 1 1 280px;          /* each column tries to be 50%, min 280px */
+  min-width: 260px;
+}
+
+.login-row input{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+    
 </style>
 
   <!-- EmailJS -->
