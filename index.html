@@ -64,11 +64,12 @@
     table{
       table-layout: fixed;
     }
-    th:nth-child(1), td:nth-child(1){ width: 45px; }
+        th:nth-child(1), td:nth-child(1){ width: 45px; }
     th:nth-child(2), td:nth-child(2){ width: 130px; }
-    th:nth-child(3), td:nth-child(3){ width: 185px; }
-    th:nth-child(4), td:nth-child(4){ width: 140px; }
-    th:nth-child(5), td:nth-child(5){ width: 160px; }
+    th:nth-child(3), td:nth-child(3){ width: 230px; }
+    th:nth-child(4), td:nth-child(4){ width: 120px; } /* Price */
+    th:nth-child(5), td:nth-child(5){ width: 130px; } /* Qty */
+    th:nth-child(6), td:nth-child(6){ width: 160px; } /* Measurement */
 
     .qty{ width:100%; }
     .uom{ width:100%; }
@@ -386,16 +387,20 @@ body:not([data-theme="dark"]) td{
 
     // ---------- Medicines (Edit your list) ----------
     const MEDICINES = [
-      { brand: "AZIN-500", strength: "Azithromycin Tablets I.P 500 mg" , available: true },
-      { brand: "ASP", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" , available: true },
-      { brand: "A-SUNAC", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" , available: true },
-      { brand: "APLSL-DiaMet", strength: "Glimepiride 2 mg + Metformin HCl (ER)" , available: false },
-      { brand: "APLSL-Lulizid", strength: "Luliconazole 1%" , available: false },
-      { brand: "Ahanitya-Ketozin", strength: "Ketoconazole 2%" , available: false },
-      { brand: "APLSL-Cutiderm", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05%" , available: false },
-      { brand: "Ahanitya-AmbroLev", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg" , available: false },
-      { brand: "PANTO-DSR", strength: "Pantoprazole 40 mg + Domperidone 30 mg" , available: true },
-      { brand: "LE-MONT", strength: "Montelukast 10 mg + Levocetirizine 5 mg" , available: true }
+      // You can set state-wise price/discount like this:
+      // pricesByState: { GJ:{doctor:140,wholeseller:130,retailer:120,stockist:125}, RJ:{doctor:145,wholeseller:135,retailer:125,stockist:130} }
+      // discountsByState: { GJ:{doctor:5,wholeseller:8,retailer:10,stockist:7}, RJ:{doctor:3,wholeseller:6,retailer:8,stockist:5} }
+      // defaultDiscounts: { doctor:0, wholeseller:0, retailer:0, stockist:0 }
+      { brand: "AZIN-500", strength: "Azithromycin Tablets I.P 500 mg" , available: true , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "ASP", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" , available: true , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "A-SUNAC", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" , available: true , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "APLSL-DiaMet", strength: "Glimepiride 2 mg + Metformin HCl (ER)" , available: false , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "APLSL-Lulizid", strength: "Luliconazole 1%" , available: false , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "Ahanitya-Ketozin", strength: "Ketoconazole 2%" , available: false , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "APLSL-Cutiderm", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05%" , available: false , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "Ahanitya-AmbroLev", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg" , available: false , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "PANTO-DSR", strength: "Pantoprazole 40 mg + Domperidone 30 mg" , available: true , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }},
+      { brand: "LE-MONT", strength: "Montelukast 10 mg + Levocetirizine 5 mg" , available: true , prices: { doctor: null, wholeseller: null, retailer: null, stockist: null }}
     ];
 
     function renderMedicineRows() {
@@ -409,7 +414,7 @@ body:not([data-theme="dark"]) td{
         const isNA = (item.available === false);
         const qtyHtml = isNA
           ? `<span class="na-text">Not Available</span>`
-          : `<input type="number" min="0" step="1" value="0" data-med="${key}" class="qty" style="max-width:110px">`;
+          : `<input type="number" min="0" step="1" value="0" data-med="${key}" data-idx="${idx}" class="qty" style="max-width:110px">`;
         const uomHtml = isNA
           ? `<span class="na-text">—</span>`
           : `<select class="uom" data-uom-med="${key}" style="max-width:140px">
@@ -423,6 +428,11 @@ body:not([data-theme="dark"]) td{
           <td>${idx + 1}</td>
           <td>${escapeHtml(item.brand)}</td>
           <td>${escapeHtml(item.strength)}</td>
+          <td class="right price-cell" data-idx="${idx}">—</td>
+          <td class="right">
+            ${isNA ? `<span class="na-text">—</span>` : `<input type="number" min="0" max="100" step="0.01" value="0" data-idx="${idx}" class="disc" style="max-width:110px">`}
+          </td>
+          <td class="right final-price-cell" data-idx="${idx}">—</td>
           <td class="right">${qtyHtml}</td>
           <td class="right">${uomHtml}</td>
 `;
@@ -434,7 +444,222 @@ body:not([data-theme="dark"]) td{
       return str.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
 
-    function getOrderItems() {
+
+
+// ---------- Role + State based Pricing & Discount ----------
+// NOTE: UI hiding is not security. For true protection of PTR/PTS, use backend/Firestore rules.
+const ROLE_LABEL = { doctor:"Doctor", wholeseller:"Wholeseller", retailer:"Retailer", stockist:"Stockist" };
+const BUSINESS_TO_ROLE = {
+  "Doctor":"doctor",
+  "Wholeseller":"wholeseller",
+  "Retailer":"retailer",
+  "Stockist":"stockist",
+  // optional mappings (keep your old options working)
+  "Distributor":"wholeseller",
+  "W/R":"retailer"
+};
+
+// Map common state names to codes used in price/discount tables
+const STATE_CODE = {
+  "gujarat":"GJ",
+  "rajasthan":"RJ",
+  "madhya pradesh":"MP",
+  "maharashtra":"MH",
+  "uttar pradesh":"UP",
+  "delhi":"DL",
+  "other":"OT",
+  "":""
+};
+
+function normalizeStateCode(val){
+  const k = String(val || "").trim().toLowerCase();
+  return STATE_CODE[k] || k.toUpperCase().slice(0,2);
+}
+
+function getStoredRole(email){
+  try { return localStorage.getItem("ahanitya_role_" + (email || "").toLowerCase()) || ""; }
+  catch(e){ return ""; }
+}
+function setStoredRole(email, roleKey){
+  try {
+    if(!email) return;
+    localStorage.setItem("ahanitya_role_" + email.toLowerCase(), roleKey || "");
+  } catch(e){}
+}
+function getStoredState(email){
+  try { return localStorage.getItem("ahanitya_state_" + (email || "").toLowerCase()) || ""; }
+  catch(e){ return ""; }
+}
+function setStoredState(email, stateCode){
+  try {
+    if(!email) return;
+    localStorage.setItem("ahanitya_state_" + email.toLowerCase(), stateCode || "");
+  } catch(e){}
+}
+
+function roleKeyFromBusiness(businessVal){
+  return BUSINESS_TO_ROLE[businessVal] || "";
+}
+
+// Price lookup priority:
+// 1) item.pricesByState?.[STATE]?.[ROLE]
+// 2) item.prices?.[ROLE]
+function getPriceFor(item, roleKey, stateCode){
+  if(!item || !roleKey) return null;
+  const st = stateCode || "";
+  const byState = item?.pricesByState?.[st]?.[roleKey];
+  if(byState !== null && byState !== undefined && byState !== "") return Number(byState);
+  const base = item?.prices?.[roleKey];
+  if(base !== null && base !== undefined && base !== "") return Number(base);
+  return null;
+}
+
+// Discount lookup priority:
+// 1) item.discountsByState?.[STATE]?.[ROLE]
+// 2) item.defaultDiscounts?.[ROLE]
+// 3) 0
+function getDefaultDiscountFor(item, roleKey, stateCode){
+  if(!item || !roleKey) return 0;
+  const st = stateCode || "";
+  const d1 = item?.discountsByState?.[st]?.[roleKey];
+  if(d1 !== null && d1 !== undefined && d1 !== "") return Number(d1);
+  const d2 = item?.defaultDiscounts?.[roleKey];
+  if(d2 !== null && d2 !== undefined && d2 !== "") return Number(d2);
+  return 0;
+}
+
+let CURRENT_ROLE_KEY = "";
+let CURRENT_STATE_CODE = "";
+
+function applyPriceUI(roleKey, stateCode){
+  CURRENT_ROLE_KEY = roleKey || "";
+  CURRENT_STATE_CODE = stateCode || "";
+
+  const head = document.getElementById("priceHead");
+  if (head) {
+    const roleLabel = CURRENT_ROLE_KEY ? ("Price to " + (ROLE_LABEL[CURRENT_ROLE_KEY] || CURRENT_ROLE_KEY)) : "Price";
+    head.textContent = CURRENT_STATE_CODE ? (roleLabel + " (" + CURRENT_STATE_CODE + ")") : roleLabel;
+  }
+
+  // update all price cells
+  document.querySelectorAll(".price-cell").forEach(td => {
+    const idx = Number(td.getAttribute("data-idx"));
+    const item = MEDICINES[idx];
+    const val = getPriceFor(item, CURRENT_ROLE_KEY, CURRENT_STATE_CODE);
+    td.textContent = (val === null || !isFinite(val)) ? "—" : String(val.toFixed(2));
+  });
+
+  // apply default discounts (only if user hasn't manually edited)
+  document.querySelectorAll(".disc").forEach(inp => {
+    const idx = Number(inp.getAttribute("data-idx"));
+    const item = MEDICINES[idx];
+    if (inp.dataset.userEdited === "1") return; // keep user's manual override
+    const defD = getDefaultDiscountFor(item, CURRENT_ROLE_KEY, CURRENT_STATE_CODE);
+    inp.value = isFinite(defD) ? String(defD) : "0";
+  });
+
+  updateFinalPrices();
+}
+
+function updateFinalPrices(){
+  document.querySelectorAll(".final-price-cell").forEach(td => {
+    const idx = Number(td.getAttribute("data-idx"));
+    const item = MEDICINES[idx];
+
+    const base = getPriceFor(item, CURRENT_ROLE_KEY, CURRENT_STATE_CODE);
+    const discInp = document.querySelector('.disc[data-idx="'+idx+'"]');
+    const disc = discInp ? Number(discInp.value || 0) : 0;
+
+    if (base === null || !isFinite(base) || !CURRENT_ROLE_KEY) {
+      td.textContent = "—";
+      return;
+    }
+    const finalVal = Number(base) * (1 - (disc/100));
+    td.textContent = isFinite(finalVal) ? finalVal.toFixed(2) : "—";
+  });
+}
+
+// Live update when discount changes (mark user override)
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.classList && e.target.classList.contains("disc")) {
+    e.target.dataset.userEdited = "1";
+    updateFinalPrices();
+  }
+});
+
+function applyRoleAndStateFromLogin(){
+  const user = auth.currentUser;
+  const email = user?.email || "";
+
+  const businessSel = document.getElementById("custBusiness");
+  const stateSel = document.getElementById("custState");
+  if (!businessSel || !stateSel) return;
+
+  const savedRole = getStoredRole(email);
+  const savedState = getStoredState(email);
+
+  // Restore / lock business type for this login
+  if (savedRole) {
+    const businessName = Object.keys(BUSINESS_TO_ROLE).find(k => BUSINESS_TO_ROLE[k] === savedRole) || "";
+    if (businessName) businessSel.value = businessName;
+    businessSel.disabled = true;
+  } else {
+    businessSel.disabled = false;
+  }
+
+  // Restore state if saved
+  if (savedState) {
+    // try set by code -> name not stored; we store code, so we just keep select value if matches known states
+    const reverse = Object.entries(STATE_CODE).reduce((acc,[k,v]) => (acc[v]=k, acc), {});
+    const nameKey = reverse[savedState] || "";
+    if (nameKey) {
+      // convert key back to Title Case label in dropdown
+      const label = nameKey.split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+      stateSel.value = label;
+    }
+  }
+
+  // If no state selected yet, default to Gujarat (can be changed anytime)
+  if (!stateSel.value) stateSel.value = "Gujarat";
+
+
+  const roleKey = savedRole || roleKeyFromBusiness(businessSel.value || "");
+  const stateCode = normalizeStateCode(stateSel.value || "");
+
+  if (roleKey) setStoredRole(email, roleKey);
+  if (stateCode) setStoredState(email, stateCode);
+
+  applyPriceUI(roleKey, stateCode);
+}
+
+// React to Business Type change (only when not locked)
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "custBusiness") {
+    const email = auth.currentUser?.email || "";
+    const roleKey = roleKeyFromBusiness(e.target.value || "");
+    const stateCode = normalizeStateCode(document.getElementById("custState")?.value || "");
+    if (roleKey) setStoredRole(email, roleKey);
+    applyPriceUI(roleKey, stateCode);
+  }
+});
+
+// React to State change
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "custState") {
+    const email = auth.currentUser?.email || "";
+    const stateCode = normalizeStateCode(e.target.value || "");
+    if (stateCode) setStoredState(email, stateCode);
+
+    // reset userEdited so defaults can re-apply on state change (optional)
+    document.querySelectorAll(".disc").forEach(inp => { inp.dataset.userEdited = ""; });
+
+    const roleKey = getStoredRole(email) || roleKeyFromBusiness(document.getElementById("custBusiness")?.value || "");
+    applyPriceUI(roleKey, stateCode);
+  }
+});
+
+
+function getOrderItems() {
       const qtyInputs = Array.from(document.querySelectorAll(".qty"));
       const uomInputs = Array.from(document.querySelectorAll(".uom"));
 
@@ -446,10 +671,27 @@ body:not([data-theme="dark"]) td{
       const items = qtyInputs
         .map(inp => {
           const med = inp.getAttribute("data-med");
+          const idx = Number(inp.getAttribute("data-idx"));
+          const uom = uomMap.get(med) || "Box";
+
+          // role key (locked per login if saved)
+          const email = auth.currentUser?.email || "";
+          const roleKey = getStoredRole(email) || roleKeyFromBusiness(document.getElementById("custBusiness")?.value || "");
+          const stateCode = normalizeStateCode(document.getElementById("custState")?.value || "");
+          const base = getPriceFor(MEDICINES?.[idx], roleKey, stateCode);
+
+          const discInp = document.querySelector('.disc[data-idx="'+idx+'"]');
+          const discount_pct = discInp ? Number(discInp.value || 0) : 0;
+
+          const final_price = (base === null || !isFinite(base)) ? null : (Number(base) * (1 - discount_pct/100));
+
           return {
             med,
             qty: Number(inp.value || 0),
-            uom: uomMap.get(med) || "Box"
+            uom,
+            unit_price: (base === null || !isFinite(base)) ? null : Number(base),
+            discount_pct,
+            final_price: (final_price === null || !isFinite(final_price)) ? null : Number(final_price.toFixed(2))
           };
         })
         .filter(x => x.qty > 0);
@@ -466,6 +708,7 @@ body:not([data-theme="dark"]) td{
       lines.push(`📧 Email: ${payload.customer_email}`);
       lines.push(`📞 Contact: ${payload.customer_phone}`);
       lines.push(`🏢 Business Type: ${payload.business_type || ""}`);
+      lines.push(`🗺️ State: ${payload.customer_state || ""} ${payload.state_code ? ("(" + payload.state_code + ")") : ""}`);
       lines.push(`👥 Referred By: ${payload.referred_by}`);
       if (payload.referred_by === "Yes") {
         lines.push(`🙍 Referrer Name: ${payload.referrer_name}`);
@@ -476,7 +719,12 @@ body:not([data-theme="dark"]) td{
       }
       lines.push("");
       lines.push("💊 *Medicines Ordered:*");
-      payload.items.forEach((it, i) => lines.push(`${i+1}. ${it.med} — Qty: ${it.qty} ${it.uom}`));
+      payload.items.forEach((it, i) => {
+        const p = (it.unit_price === null || it.unit_price === undefined) ? "—" : ("₹"+Number(it.unit_price).toFixed(2));
+        const d = (it.discount_pct === null || it.discount_pct === undefined) ? "0" : String(it.discount_pct);
+        const fp = (it.final_price === null || it.final_price === undefined) ? "—" : ("₹"+Number(it.final_price).toFixed(2));
+        lines.push(`${i+1}. ${it.med} — Qty: ${it.qty} ${it.uom} — Price: ${p} — Disc: ${d}% — Final: ${fp}`);
+      });
       lines.push("");
       lines.push(`🗓 Date/Time: ${new Date().toLocaleString()}`);
       return lines.join("\n");
@@ -488,6 +736,8 @@ body:not([data-theme="dark"]) td{
         hide($("authCard"));
         show($("orderCard"));
         $("who").textContent = user.email;
+        // Apply pricing column as per this login's saved category
+        applyRoleAndStateFromLogin();
       } else {
         show($("authCard"));
         hide($("orderCard"));
@@ -547,6 +797,8 @@ body:not([data-theme="dark"]) td{
         receiver_email: RECEIVER_EMAIL,
         items,
         business_type: $("custBusiness") ? $("custBusiness").value.trim() : "",
+        customer_state: $("custState") ? $("custState").value.trim() : "",
+        state_code: normalizeStateCode($("custState") ? $("custState").value.trim() : ""),
         referred_by: $("referredFlag") ? $("referredFlag").value : "No",
         referrer_name: $("referrerName") ? $("referrerName").value.trim() : "",
         referrer_designation: $("referrerDesignation") ? $("referrerDesignation").value.trim() : "",
@@ -594,6 +846,9 @@ body:not([data-theme="dark"]) td{
 
     // Init page
     renderMedicineRows();
+    bindBusinessTypeToPricing();
+    // If user is already logged in and role exists, apply immediately
+    applyRoleAndStateFromLogin();
 
     // Top submit button triggers same action
     const btnSubmitTop = document.getElementById("btnSubmitTop");
@@ -730,6 +985,21 @@ body:not([data-theme="dark"]) td{
             <option>W/R</option>
           </select>
         </div>
+
+        <div>
+          <label>State</label>
+          <select id="custState">
+            <option value="" selected disabled>Select state</option>
+            <option>Gujarat</option>
+            <option>Rajasthan</option>
+            <option>Madhya Pradesh</option>
+            <option>Maharashtra</option>
+            <option>Uttar Pradesh</option>
+            <option>Delhi</option>
+            <option>Other</option>
+          </select>
+          <div class="muted" style="margin-top:6px">Pricing/discount will auto-adjust based on State + Business Type.</div>
+        </div>
         <div>
           <label>Referred By</label>
           <select id="referredFlag">
@@ -767,6 +1037,9 @@ body:not([data-theme="dark"]) td{
               <th>Sr No</th>
               <th>Brand Name</th>
               <th>Strength</th>
+              <th class="right" id="priceHead">Price</th>
+              <th class="right">Discount %</th>
+              <th class="right">Final Price (₹)</th>
               <th class="right">Quantity</th>
               <th class="right">Measurement</th>
             </tr>
