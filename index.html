@@ -51,7 +51,17 @@
     .status{font-size:13px;margin-top:8px}
     .status.ok{color:#76ffb1}
     .status.err{color:#ff9aa4}
-    .na-text{display:inline-block;color:var(--danger);font-weight:800;font-size:12px}
+    .na-text{
+  display:inline-block;
+  background:#e6f6fa;
+  color:#1b8ea6;
+  border:1px solid #1b8ea6;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:.3px;
+}
   
     /* --- Alignment fix: Order Details & Medicines table ONLY --- */
     .grid.grid-2{
@@ -408,7 +418,7 @@ body:not([data-theme="dark"]) td{
         // Availability (set available:false in MEDICINES to show Not Available)
         const isNA = (item.available === false);
         const qtyHtml = isNA
-          ? `<span class="na-text">Not Available</span>`
+          ? `<span class="na-text">Coming Soon 🚀</span>`
           : `<input type="number" min="0" step="1" value="0" data-med="${key}" class="qty" style="max-width:110px">`;
         const uomHtml = isNA
           ? `<span class="na-text">—</span>`
