@@ -418,7 +418,7 @@ body:not([data-theme="dark"]) td{
         // Availability (set available:false in MEDICINES to show Not Available)
         const isNA = (item.available === false);
         const qtyHtml = isNA
-          ? `<span class="na-text">Coming Soon 🚀</span>`
+          ? `<span class="na-text">Updating Soon 🚀</span>`
           : `<input type="number" min="0" step="1" value="0" data-med="${key}" class="qty" style="max-width:110px">`;
         const uomHtml = isNA
           ? `<span class="na-text">—</span>`
