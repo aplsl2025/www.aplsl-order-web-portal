@@ -367,10 +367,6 @@ body:not([data-theme="dark"]) td{
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
       from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } 
-      from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
-
-
     // ✅ 1) PUT YOUR FIREBASE CONFIG HERE
     const firebaseConfig = {
       apiKey: "AIzaSyCneC5CT9qfM8myRfoMZ7N4efUezDYMbLY",
@@ -391,7 +387,6 @@ body:not([data-theme="dark"]) td{
     // ---------- Init ----------
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const storage = getStorage(app);
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
     // ---------- UI Helpers ----------
@@ -472,32 +467,6 @@ body:not([data-theme="dark"]) td{
       return items;
     }
 
-// ---------- Prescription Upload (Firebase Storage) ----------
-async function uploadPrescriptionIfAny(businessType) {
-  const fileInput = document.getElementById("custPrescription");
-  const file = fileInput && fileInput.files ? fileInput.files[0] : null;
-  if (!file) return ""; // nothing to upload
-
-  // Customer: enforce file
-  if (businessType === "Customer" && !file) return "";
-
-  // Create a unique path
-  const safeName = (file.name || "prescription").replace(/[^a-zA-Z0-9._-]/g, "_");
-  const ts = Date.now();
-  const userEmail = (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email : "guest";
-  const safeEmail = userEmail.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-  const path = `prescriptions/${safeEmail}/${ts}_${safeName}`;
-  const refObj = storageRef(storage, path);
-
-  // Upload
-  await uploadBytes(refObj, file, { contentType: file.type || "application/octet-stream" });
-
-  // Get public download URL
-  const url = await getDownloadURL(refObj);
-  return url || "";
-}
-
     function buildOrderText(payload) {
       const lines = [];
       lines.push("📦 *Ahanitya Order*");
@@ -507,9 +476,6 @@ async function uploadPrescriptionIfAny(businessType) {
       lines.push(`📧 Email: ${payload.customer_email}`);
       lines.push(`📞 Contact: ${payload.customer_phone}`);
       lines.push(`🏢 Business Type: ${payload.business_type || ""}`);
-      if (payload.prescription_url) {
-        lines.push(`🧾 Prescription Link: ${payload.prescription_url}`);
-      }
       lines.push(`👥 Referred By: ${payload.referred_by}`);
       if (payload.referred_by === "Yes") {
         lines.push(`🙍 Referrer Name: ${payload.referrer_name}`);
@@ -603,25 +569,6 @@ async function uploadPrescriptionIfAny(businessType) {
         return;
       }
 
-// Upload prescription (Customer only) and include link in WhatsApp + Email text
-const selectedBusiness = payload.business_type;
-const presFile = document.getElementById("custPrescription")?.files?.[0];
-
-if (selectedBusiness === "Customer" && !presFile) {
-  $("orderStatus").textContent = "Prescription upload is required for Customer orders.";
-  $("orderStatus").className = "status err";
-  return;
-}
-
-try {
-  payload.prescription_url = await uploadPrescriptionIfAny(selectedBusiness);
-} catch (err) {
-  console.error(err);
-  $("orderStatus").textContent = "Prescription upload failed. Please try again or send prescription separately.";
-  $("orderStatus").className = "status err";
-  return;
-}
-
       const orderText = buildOrderText(payload);
 
       // 1) Send Email via EmailJS
@@ -657,17 +604,6 @@ try {
 
     // Init page
     renderMedicineRows();
-
-// Show prescription upload ONLY for Customer category
-const custBusiness = document.getElementById("custBusiness");
-const prescriptionUpload = document.getElementById("prescriptionUpload");
-if (custBusiness && prescriptionUpload) {
-  custBusiness.addEventListener("change", () => {
-    prescriptionUpload.style.display = (custBusiness.value === "Customer") ? "block" : "none";
-  });
-  // initial
-  prescriptionUpload.style.display = (custBusiness.value === "Customer") ? "block" : "none";
-}
 
     // Top submit button triggers same action
     const btnSubmitTop = document.getElementById("btnSubmitTop");
@@ -802,8 +738,6 @@ if (custBusiness && prescriptionUpload) {
             <option>Stockist</option>
             <option>Retailer</option>
             <option>W/R</option>
-            <option>Hospital Supplies</option>
-            <option value="Customer">Customer</option>
           </select>
         </div>
         <div>
@@ -825,12 +759,6 @@ if (custBusiness && prescriptionUpload) {
         <div>
           <label>Address</label>
           <input id="custAddress" type="text" placeholder="Full delivery address" />
-        </div>
-
-        <div id="prescriptionUpload" style="display:none;">
-          <label>Attach Prescription Copy (Customer only)</label>
-          <input type="file" id="custPrescription" accept=".jpg,.jpeg,.png,.pdf" />
-          <div class="muted">Upload prescription image or PDF (recommended ≤ 5MB). A link will be sent on WhatsApp.</div>
         </div>
       </div>
 
