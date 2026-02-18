@@ -76,9 +76,10 @@
     }
     th:nth-child(1), td:nth-child(1){ width: 45px; }
     th:nth-child(2), td:nth-child(2){ width: 130px; }
-    th:nth-child(3), td:nth-child(3){ width: 185px; }
-    th:nth-child(4), td:nth-child(4){ width: 140px; }
-    th:nth-child(5), td:nth-child(5){ width: 160px; }
+    th:nth-child(3), td:nth-child(3){ width: 90px; }   /* Product Type */
+    th:nth-child(4), td:nth-child(4){ width: 185px; }  /* Strength */
+    th:nth-child(5), td:nth-child(5){ width: 140px; }  /* Quantity */
+    th:nth-child(6), td:nth-child(6){ width: 160px; }  /* Measurement */
 
     .qty{ width:100%; }
     .uom{ width:100%; }
@@ -396,16 +397,16 @@ body:not([data-theme="dark"]) td{
 
     // ---------- Medicines (Edit your list) ----------
     const MEDICINES = [
-      { brand: "AZIN-500", strength: "Azithromycin Tablets I.P 500 mg" , available: true },
-      { brand: "ASP", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" , available: true },
-      { brand: "A-SUNAC", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" , available: true },
-      { brand: "APLSL-DiaMet", strength: "Glimepiride 2 mg + Metformin HCl (ER)" , available: false },
-      { brand: "APLSL-Lulizid", strength: "Luliconazole 1%" , available: false },
-      { brand: "Ahanitya-Ketozin", strength: "Ketoconazole 2%" , available: false },
-      { brand: "APLSL-Cutiderm", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05%" , available: false },
-      { brand: "Ahanitya-AmbroLev", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg" , available: false },
-      { brand: "PANTO-DSR", strength: "Pantoprazole 40 mg + Domperidone 30 mg" , available: true },
-      { brand: "LE-MONT", strength: "Montelukast 10 mg + Levocetirizine 5 mg" , available: true }
+      { brand: "AZIN-500", product_type: "TAB", strength: "Azithromycin Tablets I.P 500 mg" , available: true },
+      { brand: "ASP", product_type: "TAB", strength: "Aceclofenac 100 mg + Paracetamol 325 mg + Serratiopeptidase 15 mg" , available: true },
+      { brand: "A-SUNAC", product_type: "TAB", strength: "Aceclofenac 100 mg + Paracetamol 325 mg" , available: true },
+      { brand: "APLSL-DiaMet", product_type: "TAB", strength: "Glimepiride 2 mg + Metformin HCl (ER)" , available: false },
+      { brand: "APLSL-Lulizid", product_type: "TAB", strength: "Luliconazole 1%" , available: false },
+      { brand: "Ahanitya-Ketozin", product_type: "TAB", strength: "Ketoconazole 2%" , available: false },
+      { brand: "APLSL-Cutiderm", product_type: "TAB", strength: "Itraconazole 1% + Ofloxacin 0.75% + Ornidazole 2% + Clobetasol 0.05%" , available: false },
+      { brand: "Ahanitya-AmbroLev", product_type: "TAB", strength: "Ambroxol 60 mg + Levocetirizine 2.5 mg + Paracetamol 500 mg + Phenylephrine 5 mg" , available: false },
+      { brand: "PANTO-DSR", product_type: "TAB", strength: "Pantoprazole 40 mg + Domperidone 30 mg" , available: true },
+      { brand: "LE-MONT", product_type: "TAB", strength: "Montelukast 10 mg + Levocetirizine 5 mg" , available: true }
     ];
 
     function renderMedicineRows() {
@@ -432,10 +433,12 @@ body:not([data-theme="dark"]) td{
         tr.innerHTML = `
           <td>${idx + 1}</td>
           <td>${escapeHtml(item.brand)}</td>
+          <td>${escapeHtml(item.product_type || "TAB")}</td>
           <td>${escapeHtml(item.strength)}</td>
           <td class="right">${qtyHtml}</td>
           <td class="right">${uomHtml}</td>
 `;
+
         tbody.appendChild(tr);
       });
     }
@@ -776,6 +779,7 @@ body:not([data-theme="dark"]) td{
             <tr>
               <th>Sr No</th>
               <th>Brand Name</th>
+              <th>Product Type</th>
               <th>Strength</th>
               <th class="right">Quantity</th>
               <th class="right">Measurement</th>
