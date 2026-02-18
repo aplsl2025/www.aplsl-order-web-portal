@@ -432,6 +432,7 @@ body:not([data-theme="dark"]) td{
              </select>`;
 
         const tr = document.createElement("tr");
+        tr.dataset.search = `${item.brand} ${item.product_type || ""} ${item.strength}`.toLowerCase();
         tr.innerHTML = `
           <td>${idx + 1}</td>
           <td>${escapeHtml(item.brand)}</td>
@@ -610,6 +611,20 @@ body:not([data-theme="dark"]) td{
     // Init page
     renderMedicineRows();
 
+
+    // ---------- Medicine Search ----------
+    const medSearch = document.getElementById("medSearch");
+    if (medSearch) {
+      medSearch.addEventListener("input", () => {
+        const q = (medSearch.value || "").trim().toLowerCase();
+        const rows = Array.from(document.querySelectorAll("#medBody tr"));
+        rows.forEach(tr => {
+          const hay = (tr.dataset.search || tr.textContent || "").toLowerCase();
+          tr.style.display = (!q || hay.includes(q)) ? "" : "none";
+        });
+      });
+    }
+
     // Top submit button triggers same action
     const btnSubmitTop = document.getElementById("btnSubmitTop");
     if (btnSubmitTop) {
@@ -769,6 +784,12 @@ body:not([data-theme="dark"]) td{
 
       <div id="medSection" style="margin-top:14px">
         <h2 style="margin-bottom:10px">Select Medicines & Quantity</h2>
+
+<div class="med-search" style="margin:10px 0 12px 0;">
+          <label for="medSearch" style="margin:0 0 6px 0;">Search Medicine</label>
+          <input id="medSearch" type="text" placeholder="Search by Brand / Product Type / Strength..." autocomplete="off" />
+          <div class="muted" style="margin-top:6px">Tip: type “AZIN”, “TAB”, “CAP”, “Pantoprazole”, etc.</div>
+        </div>
 
       <div class="row" style="margin-bottom:14px">
         <button class="btn btn-primary" id="btnSubmitTop">Submit Order (Email + WhatsApp)</button>
