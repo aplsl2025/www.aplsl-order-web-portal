@@ -299,9 +299,15 @@ body:not([data-theme="dark"]) td{
   height: calc(520px - 130px); /* leaves room for title + buttons + small notes */
   overflow-y: auto;
   overflow-x: auto;
-  /* enables top-bottom + left-right scroll */
   -webkit-overflow-scrolling: touch;
   border-radius: 12px;
+
+  /* ✅ keep bottom (horizontal) scrollbar fully visible */
+  box-sizing: border-box;
+  padding-bottom: 16px;
+  scrollbar-gutter: stable both-edges;
+  display: block;
+  width: 100%;
 }
 
 
@@ -322,13 +328,17 @@ body:not([data-theme="dark"]) td{
 
 /* Make sure scroll container allows full-width content */
 #medSection .medScroll{
-  white-space: nowrap;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 16px;
+  scrollbar-gutter: stable both-edges;
 }
-#medSection .medScroll table,
-#medSection .medScroll thead,
-#medSection .medScroll tbody,
-#medSection .medScroll tr{
-  white-space: normal;
+
+#medSection table{
+  min-width: 1200px;  /* ensures horizontal scroll appears */
 }
 /* Login / Create Account: prevent overlap */
 .login-row{
